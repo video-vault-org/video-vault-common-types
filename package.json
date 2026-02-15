@@ -1,7 +1,7 @@
 {
   "name": "@video-vault/video-vault-common-types",
   "version": "0.0.1",
-  "description": "Common library for types for backend and frontends.",
+  "description": "Common library for types for backend and frontends of VideoVault.",
   "private": false,
   "type": "module",
   "main": "built/index.js",
