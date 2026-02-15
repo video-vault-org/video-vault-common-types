@@ -39,9 +39,8 @@ jobs:
       - name: Build project
         run: npm run build
 
-      -  name: Publish to npm
-         uses: JS-DevTools/npm-publish@v3
-         with:
-           token: ${{ secrets.NPM_TOKEN }}
-           tag: latest
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
 
