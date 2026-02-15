@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure tag points to main
+        run: |
+          git fetch origin main
+          TAG_COMMIT=$(git rev-parse $GITHUB_REF)
+          MAIN_COMMIT=$(git rev-parse origin/main)
+          if [ "$TAG_COMMIT" != "$MAIN_COMMIT" ]; then
+            echo "Tag is not on main branch, skipping release."
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org/'
+          scope: '@video-vault'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: QA
+        run: npm run qa
+
+      - name: Build project
+        run: npm run build
+
+      -  name: Publish to npm
+         uses: JS-DevTools/npm-publish@v3
+         with:
+           token: ${{ secrets.NPM_TOKEN }}
+           tag: latest
+
