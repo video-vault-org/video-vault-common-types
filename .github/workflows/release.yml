@@ -1,4 +1,4 @@
-name: Release
+name: Release Package
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-and-publish:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,12 +23,17 @@ jobs:
             exit 1
           fi
 
-      - name: Setup Node.js
+      - name: Setup Node.js with required version for OIDC
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org/'
+          # Trusted publishing requires npm CLI version 11.5.1 or later and Node version 22.14.0 or higher
+          node-version: '22.14.0'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@video-vault'
+
+      - name: install required npm version for OIDC
+        # Trusted publishing requires npm CLI version 11.5.1 or later and Node version 22.14.0 or higher
+        run: npm install -g npm@11.5.1
 
       - name: Install dependencies
         run: npm install
@@ -40,7 +45,7 @@ jobs:
         run: npm run build
 
       - name: Publish
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ github.token }}
+        #provenance flag sometimes required, due to a bug?
+        #https://philna.sh/blog/2026/01/28/trusted-publishing-npm/
+        run: npm publish --provenance
 
